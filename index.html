@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="白水族谱">
+  <meta name="theme-color" content="#5d8cc1">
+  <link rel="manifest" href="manifest.json">
+  <title>白水电子族谱</title>
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB',
+                   'Microsoft YaHei', 'WenQuanYi Micro Hei', sans-serif;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      background: #f8fafc;
+    }
+
+    /* ─── Header ─────────────────────────── */
+    #app-header {
+      background: #5d8cc1;
+      color: white;
+      padding: 0 16px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+    }
+
+    #app-header h1 {
+      font-size: 19px;
+      font-weight: 600;
+      flex-grow: 1;
+    }
+
+    .header-btn {
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: white;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 20px;
+      flex-shrink: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .header-btn:active {
+      background: rgba(255, 255, 255, 0.35);
+    }
+
+    /* ─── Search bar ─────────────────────── */
+    #search-bar {
+      background: white;
+      padding: 8px 12px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-shrink: 0;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    #mySearch {
+      flex-grow: 1;
+      padding: 8px 14px;
+      border: 1.5px solid #cbd5e0;
+      border-radius: 24px;
+      font-size: 16px;
+      outline: none;
+      background: #f7f9fc;
+      transition: border-color 0.15s;
+      min-width: 0;
+    }
+
+    #mySearch:focus {
+      border-color: #5d8cc1;
+      background: white;
+    }
+
+    .search-btn {
+      padding: 8px 14px;
+      background: #5d8cc1;
+      color: white;
+      border: none;
+      border-radius: 24px;
+      font-size: 14px;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .search-btn:active {
+      background: #4a7ab0;
+    }
+
+    /* ─── Diagram ────────────────────────── */
+    #myDiagramDiv {
+      flex-grow: 1;
+      background-color: #f8fafc;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* ─── Loading overlay ────────────────── */
+    #loading-overlay {
+      position: fixed;
+      inset: 0;
+      background: #f8fafc;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      transition: opacity 0.3s ease;
+    }
+
+    #loading-overlay.fade-out {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .spinner {
+      width: 52px;
+      height: 52px;
+      border: 4px solid #e2e8f0;
+      border-top-color: #5d8cc1;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    .loading-title {
+      margin-top: 20px;
+      font-size: 22px;
+      font-weight: 600;
+      color: #5d8cc1;
+    }
+
+    .loading-sub {
+      margin-top: 8px;
+      color: #94a3b8;
+      font-size: 15px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ─── Toast ──────────────────────────── */
+    #toast {
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: rgba(30, 41, 59, 0.85);
+      color: white;
+      padding: 10px 22px;
+      border-radius: 24px;
+      font-size: 14px;
+      transition: transform 0.3s ease;
+      z-index: 500;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    #toast.show {
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Loading overlay shown on startup -->
+  <div id="loading-overlay">
+    <div class="spinner"></div>
+    <div class="loading-title">白水电子族谱</div>
+    <div class="loading-sub">正在加载族谱数据...</div>
+  </div>
+
+  <!-- Toast notification -->
+  <div id="toast"></div>
+
+  <!-- Header bar -->
+  <div id="app-header">
+    <h1>白水电子族谱</h1>
+    <label for="choose-file" class="header-btn" title="导入 JSON 数据文件">📂</label>
+    <input type="file" id="choose-file" accept="application/json,.json" style="display:none">
+  </div>
+
+  <!-- Search bar -->
+  <div id="search-bar">
+    <input type="search" id="mySearch" placeholder="搜索姓名或地名...">
+    <button class="search-btn" id="searchBtn">搜索</button>
+    <button class="search-btn" id="nextBtn">下一个</button>
+  </div>
+
+  <!-- GoJS diagram fills remaining height -->
+  <div id="myDiagramDiv"></div>
+
+  <script src="https://unpkg.com/gojs@3.0.4/release/go.js"></script>
+  <script>
+    // ───────────────────────────────────────────────────────────────────────
+    // GenogramLayout — custom layout positioning husband/wife pairs
+    // ───────────────────────────────────────────────────────────────────────
+    class GenogramLayout extends go.LayeredDigraphLayout {
+      constructor() {
+        super();
+        this.initializeOption = go.LayeredDigraphInit.WidthFirstIn;
+        this.spouseSpacing = 30;
+        this.isRouting = false;
+      }
+
+      makeNetwork(coll) {
+        const net = this.createNetwork();
+        if (coll instanceof go.Diagram) {
+          this.add(net, coll.nodes, true);
+          this.add(net, coll.links, true);
+        } else if (coll instanceof go.Group) {
+          this.add(net, coll.memberParts, false);
+        } else if (coll.iterator) {
+          this.add(net, coll.iterator, false);
+        }
+        return net;
+      }
+
+      add(net, coll, nonmemberonly) {
+        const horiz = this.direction === 0.0 || this.direction === 180.0;
+        const multiSpousePeople = new go.Set();
+        const it = coll.iterator;
+
+        while (it.next()) {
+          const node = it.value;
+          if (!(node instanceof go.Node) || !node.data) continue;
+          if (!node.isLayoutPositioned || !node.isVisible()) continue;
+          if (nonmemberonly && node.containingGroup !== null) continue;
+
+          if (node.isLinkLabel) {
+            const link = node.labeledLink;
+            if (link.category === 'Marriage') {
+              const spouseA = link.fromNode;
+              const spouseB = link.toNode;
+              const vertex = net.addNode(node);
+              if (horiz) {
+                vertex.height = spouseA.actualBounds.height + this.spouseSpacing + spouseB.actualBounds.height;
+                vertex.width = Math.max(spouseA.actualBounds.width, spouseB.actualBounds.width);
+                vertex.focus = new go.Point(vertex.width / 2, spouseA.actualBounds.height + this.spouseSpacing / 2);
+              } else {
+                vertex.width = spouseA.actualBounds.width + this.spouseSpacing + spouseB.actualBounds.width;
+                vertex.height = Math.max(spouseA.actualBounds.height, spouseB.actualBounds.height);
+                vertex.focus = new go.Point(spouseA.actualBounds.width + this.spouseSpacing / 2, vertex.height / 2);
+              }
+            }
+          } else {
+            let marriages = 0;
+            node.linksConnected.each(l => { if (l.category === 'Marriage') marriages++; });
+            if (marriages === 0) {
+              net.addNode(node);
+            } else if (marriages > 1) {
+              multiSpousePeople.add(node);
+            }
+          }
+        }
+
+        it.reset();
+        while (it.next()) {
+          const link = it.value;
+          if (!(link instanceof go.Link)) continue;
+          if (!link.isLayoutPositioned || !link.isVisible()) continue;
+          if (nonmemberonly && link.containingGroup !== null) continue;
+          if (link.category === '' && link.data) {
+            const parent = net.findVertex(link.fromNode);
+            const child = net.findVertex(link.toNode);
+            if (child !== null) {
+              net.linkVertexes(parent, child, link);
+            } else {
+              link.toNode.linksConnected.each(l => {
+                if (l.category !== 'Marriage' || !l.data) return;
+                const mlab = l.labelNodes.first();
+                const mlabvert = net.findVertex(mlab);
+                if (mlabvert !== null) net.linkVertexes(parent, mlabvert, link);
+              });
+            }
+          }
+        }
+
+        while (multiSpousePeople.count > 0) {
+          const node = multiSpousePeople.first();
+          const cohort = new go.Set();
+          this.extendCohort(cohort, node);
+          const dummyvert = net.createVertex();
+          net.addVertex(dummyvert);
+          const marriages = new go.Set();
+          cohort.each(n => { n.linksConnected.each(l => marriages.add(l)); });
+          marriages.each(link => {
+            const mlab = link.labelNodes.first();
+            const v = net.findVertex(mlab);
+            if (v !== null) net.linkVertexes(dummyvert, v, null);
+          });
+          multiSpousePeople.removeAll(cohort);
+        }
+      }
+
+      extendCohort(coll, node) {
+        if (coll.has(node)) return;
+        coll.add(node);
+        node.linksConnected.each(l => {
+          if (l.category === 'Marriage') {
+            this.extendCohort(coll, l.fromNode);
+            this.extendCohort(coll, l.toNode);
+          }
+        });
+      }
+
+      assignLayers() {
+        super.assignLayers();
+        const horiz = this.direction === 0.0 || this.direction === 180.0;
+        const maxsizes = [];
+        this.network.vertexes.each(v => {
+          const lay = v.layer;
+          let max = maxsizes[lay];
+          if (max === undefined) max = 0;
+          const sz = horiz ? v.width : v.height;
+          if (sz > max) maxsizes[lay] = sz;
+        });
+        this.network.vertexes.each(v => {
+          const lay = v.layer;
+          const max = maxsizes[lay];
+          if (horiz) {
+            v.focus = new go.Point(0, v.height / 2);
+            v.width = max;
+          } else {
+            v.focus = new go.Point(v.width / 2, 0);
+            v.height = max;
+          }
+        });
+      }
+
+      initializeIndices() {
+        super.initializeIndices();
+        const vertical = this.direction === 90 || this.direction === 270;
+        this.network.edges.each(e => {
+          if (e.fromVertex.node && e.fromVertex.node.isLinkLabel)
+            e.portFromPos = vertical ? e.fromVertex.focusX : e.fromVertex.focusY;
+          if (e.toVertex.node && e.toVertex.node.isLinkLabel)
+            e.portToPos = vertical ? e.toVertex.focusX : e.toVertex.focusY;
+        });
+      }
+
+      commitNodes() {
+        super.commitNodes();
+        this.network.vertexes.each(v => {
+          if (v.node !== null && !v.node.isLinkLabel) v.node.position = new go.Point(v.x, v.y);
+        });
+        const horiz = this.direction === 0.0 || this.direction === 180.0;
+        this.network.vertexes.each(v => {
+          if (v.node === null || !v.node.isLinkLabel) return;
+          const labnode = v.node;
+          const lablink = labnode.labeledLink;
+          lablink.invalidateRoute();
+          // husband on left, wife on right
+          let spouseA = lablink.toNode;
+          let spouseB = lablink.fromNode;
+          if (spouseA.opacity > 0 && spouseB.opacity > 0) {
+            if (spouseA.category === 'F') { const t = spouseA; spouseA = spouseB; spouseB = t; }
+            const aParentsNode = this.findParentsMarriageLabelNode(spouseA);
+            const bParentsNode = this.findParentsMarriageLabelNode(spouseB);
+            if (aParentsNode !== null && bParentsNode !== null &&
+              (horiz ? aParentsNode.position.x > bParentsNode.position.x
+                     : aParentsNode.position.y > bParentsNode.position.y)) {
+              const t = spouseA; spouseA = spouseB; spouseB = t;
+            }
+            spouseA.moveTo(v.x, v.y);
+            if (horiz) spouseB.moveTo(v.x, v.y + spouseA.actualBounds.height + this.spouseSpacing);
+            else spouseB.moveTo(v.x + spouseA.actualBounds.width + this.spouseSpacing, v.y);
+          } else if (spouseA.opacity === 0) {
+            const pos = horiz
+              ? new go.Point(v.x, v.centerY - spouseB.actualBounds.height / 2)
+              : new go.Point(v.centerX - spouseB.actualBounds.width / 2, v.y);
+            spouseB.move(pos);
+            if (horiz) pos.y++; else pos.x++;
+            spouseA.move(pos);
+          } else if (spouseB.opacity === 0) {
+            const pos = horiz
+              ? new go.Point(v.x, v.centerY - spouseA.actualBounds.height / 2)
+              : new go.Point(v.centerX - spouseA.actualBounds.width / 2, v.y);
+            spouseA.move(pos);
+            if (horiz) pos.y++; else pos.x++;
+            spouseB.move(pos);
+          }
+          lablink.ensureBounds();
+        });
+      }
+
+      findParentsMarriageLabelNode(node) {
+        const it = node.findNodesInto();
+        while (it.next()) {
+          const n = it.value;
+          if (n.isLinkLabel) return n;
+        }
+        return null;
+      }
+    }
+
+    // ───────────────────────────────────────────────────────────────────────
+    // Diagram initialisation
+    // ───────────────────────────────────────────────────────────────────────
+    let myDiagram;
+
+    function init() {
+      const $ = go.GraphObject.make;
+
+      myDiagram = new go.Diagram('myDiagramDiv', {
+        'animationManager.isEnabled': true,
+        'draggingTool.isCopyEnabled': false,
+        initialDocumentSpot: go.Spot.Bottom,
+        initialViewportSpot: go.Spot.Bottom,
+        layout: $(GenogramLayout, { direction: 90, layerSpacing: 50, columnSpacing: 50 })
+      });
+
+      const colors = {
+        gray: '#6d7278',
+        blue: '#5d8cc1'
+      };
+
+      myDiagram.nodeTemplate =
+        $(go.Node, 'Vertical',
+          { locationSpot: go.Spot.Center, locationObjectName: 'ICON', selectionObjectName: 'ICON' },
+          $(go.Panel, { name: 'ICON' },
+            $(go.Shape, {
+              figure: 'RoundedRectangle',
+              desiredSize: new go.Size(100, 50),
+              fill: 'transparent',
+              stroke: colors.blue,
+              portId: '',
+              parameter1: 12,
+              strokeWidth: 1
+            },
+            new go.Binding('fill', 'gender', g => g === 'M' ? colors.blue : 'pink')
+            ),
+            $(go.TextBlock, {
+              textAlign: 'center',
+              verticalAlignment: go.Spot.Center,
+              font: 'bold 22px sans-serif',
+              desiredSize: new go.Size(100, 50),
+              overflow: go.TextOverflow.Ellipsis,
+              alignmentFocus: go.Spot.Top,
+              toolTip: go.GraphObject.build('ToolTip')
+                .add(new go.TextBlock({ margin: 4 }).bind('text', 'comment'))
+            },
+            new go.Binding('text', 'name')
+            )
+          ),
+          $(go.TextBlock, { textAlign: 'left', font: '18px sans-serif' },
+            new go.Binding('text', getNodeInfo)
+          )
+        );
+
+      myDiagram.nodeTemplateMap.add('LinkLabel',
+        $(go.Node, { selectable: false, width: 1, height: 1, fromEndSegmentLength: 20 })
+      );
+
+      myDiagram.linkTemplate =
+        $(go.Link, {
+          routing: go.Routing.Orthogonal, corner: 10, curviness: 15,
+          layerName: 'Background', selectable: false
+        },
+        $(go.Shape, { stroke: colors.gray, strokeWidth: 1.5 })
+        );
+
+      myDiagram.linkTemplateMap.add('Marriage',
+        $(go.Link, {
+          routing: go.Routing.AvoidsNodes, corner: 10,
+          fromSpot: go.Spot.LeftRightSides, toSpot: go.Spot.LeftRightSides,
+          selectable: false, isTreeLink: false, layerName: 'Background'
+        },
+        $(go.Shape, { strokeWidth: 3, stroke: colors.blue })
+        )
+      );
+    }
+
+    // ───────────────────────────────────────────────────────────────────────
+    // Data model helpers
+    // ───────────────────────────────────────────────────────────────────────
+    function setupDiagram(diagram, array, focusId) {
+      diagram.model = new go.GraphLinksModel({
+        linkLabelKeysProperty: 'labelKeys',
+        copiesArrays: true,
+        nodeDataArray: array
+      });
+      setupMarriages(diagram);
+      setupParents(diagram);
+      const node = diagram.findNodeForKey(focusId);
+      if (node !== null) node.isSelected = true;
+    }
+
+    function findMarriage(diagram, a, b) {
+      const nodeA = diagram.findNodeForKey(a);
+      const nodeB = diagram.findNodeForKey(b);
+      if (nodeA !== null && nodeB !== null) {
+        const it = nodeA.findLinksBetween(nodeB);
+        while (it.next()) {
+          const link = it.value;
+          if (link.data !== null && link.data.category === 'Marriage') return link;
+        }
+      }
+      return null;
+    }
+
+    function setupMarriages(diagram) {
+      const model = diagram.model;
+      const nodeDataArray = model.nodeDataArray;
+      for (let i = 0; i < nodeDataArray.length; i++) {
+        const data = nodeDataArray[i];
+        const key = data.key;
+
+        let wifes = data.wife;
+        if (wifes !== undefined) {
+          if (typeof wifes === 'number') wifes = [wifes];
+          for (let j = 0; j < wifes.length; j++) {
+            const wife = wifes[j];
+            const wdata = model.findNodeDataForKey(wife);
+            if (key === wife || !wdata || wdata.gender !== 'F') continue;
+            if (findMarriage(diagram, key, wife) === null) {
+              const mlab = { category: 'LinkLabel' };
+              model.addNodeData(mlab);
+              model.addLinkData({ from: key, to: wife, labelKeys: [mlab.key], category: 'Marriage' });
+            }
+          }
+        }
+
+        let husbands = data.husband;
+        if (husbands !== undefined) {
+          if (typeof husbands === 'number') husbands = [husbands];
+          for (let j = 0; j < husbands.length; j++) {
+            const husband = husbands[j];
+            const hdata = model.findNodeDataForKey(husband);
+            if (key === husband || !hdata || hdata.gender !== 'M') continue;
+            if (findMarriage(diagram, key, husband) === null) {
+              const mlab = { category: 'LinkLabel' };
+              model.addNodeData(mlab);
+              model.addLinkData({ from: key, to: husband, labelKeys: [mlab.key], category: 'Marriage' });
+            }
+          }
+        }
+      }
+    }
+
+    function setupParents(diagram) {
+      const model = diagram.model;
+      const nodeDataArray = model.nodeDataArray;
+      for (let i = 0; i < nodeDataArray.length; i++) {
+        const data = nodeDataArray[i];
+        const mother = data.mother;
+        const father = data.father;
+        if (mother == null || father == null) continue;
+        const link = findMarriage(diagram, mother, father);
+        if (link === null) continue;
+        const mdata = link.data;
+        if (!mdata.labelKeys || mdata.labelKeys[0] === undefined) continue;
+        diagram.model.addLinkData({ from: mdata.labelKeys[0], to: data.key });
+      }
+    }
+
+    function getNodeInfo(data) {
+      let text = '';
+      if (data.birthtime !== undefined) text += '\n*' + data.birthtime;
+      if (data.alias !== undefined)     text += ', ' + data.alias;
+      if (data.order !== undefined)     text += ', ' + data.order;
+      if (data.birthplace !== undefined) text += '\n' + data.birthplace;
+      if (data.deathtime !== undefined)  text += '\n†' + data.deathtime;
+      if (data.buryplace !== undefined)  text += '\n' + data.buryplace;
+      if (data.comment !== undefined)    text += '\n' + data.comment;
+      return text;
+    }
+
+    // ───────────────────────────────────────────────────────────────────────
+    // Manual file import (fallback)
+    // ───────────────────────────────────────────────────────────────────────
+    function readFile(input) {
+      const file = input.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.readAsText(file);
+      reader.onload = () => {
+        try {
+          const data = JSON.parse(reader.result);
+          setupDiagram(myDiagram, data, data[0].key);
+          showToast('数据导入成功 ✓');
+        } catch {
+          showToast('JSON 格式错误，请检查文件');
+        }
+      };
+      reader.onerror = () => showToast('文件读取失败');
+      input.value = '';
+    }
+
+    // ───────────────────────────────────────────────────────────────────────
+    // Search
+    // ───────────────────────────────────────────────────────────────────────
+    function searchDiagram() {
+      const input = document.getElementById('mySearch');
+      if (!input.value.trim()) { showToast('请输入搜索内容'); return; }
+      const safe = input.value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const regex = new RegExp(safe, 'i');
+      const results = myDiagram.findNodesByExample(
+        { name: regex }, { alias: regex }, { birthplace: regex }, { buryplace: regex }
+      );
+      if (results.count > 0) {
+        myDiagram.clearHighlighteds();
+        myDiagram.highlightCollection(results);
+        myDiagram.commandHandler.scrollToPart();
+        showToast('找到 ' + results.count + ' 个结果');
+      } else {
+        showToast('未找到匹配内容');
+      }
+    }
+
+    function findNext() {
+      myDiagram.commandHandler.scrollToPart();
+    }
+
+    // ───────────────────────────────────────────────────────────────────────
+    // Toast
+    // ───────────────────────────────────────────────────────────────────────
+    let _toastTimer = null;
+
+    function showToast(msg, duration = 2800) {
+      const el = document.getElementById('toast');
+      el.textContent = msg;
+      el.classList.add('show');
+      clearTimeout(_toastTimer);
+      _toastTimer = setTimeout(() => el.classList.remove('show'), duration);
+    }
+
+    // ───────────────────────────────────────────────────────────────────────
+    // Auto-load data-template.json on startup
+    // ───────────────────────────────────────────────────────────────────────
+    function hideLoading() {
+      const overlay = document.getElementById('loading-overlay');
+      overlay.classList.add('fade-out');
+      setTimeout(() => { overlay.style.display = 'none'; }, 350);
+    }
+
+    async function autoLoadData() {
+      try {
+        const resp = await fetch('data-template.json');
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        const data = await resp.json();
+        setupDiagram(myDiagram, data, data[0].key);
+        hideLoading();
+        showToast('族谱数据加载成功 ✓');
+      } catch (err) {
+        console.warn('Auto-load failed:', err);
+        hideLoading();
+        showToast('请点击 📂 手动导入族谱 JSON 文件');
+      }
+    }
+
+    // ───────────────────────────────────────────────────────────────────────
+    // Bootstrap
+    // ───────────────────────────────────────────────────────────────────────
+    window.addEventListener('DOMContentLoaded', () => {
+      init();
+      autoLoadData();
+
+      document.getElementById('choose-file').addEventListener('change', function () { readFile(this); });
+      document.getElementById('searchBtn').addEventListener('click', searchDiagram);
+      document.getElementById('nextBtn').addEventListener('click', findNext);
+      document.getElementById('mySearch').addEventListener('keypress', e => {
+        if (e.key === 'Enter') searchDiagram();
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+{
+  "appId": "com.baishu.familytree",
+  "appName": "白水族谱",
+  "webDir": "www",
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 1500,
+      "backgroundColor": "#f8fafc",
+      "showSpinner": false
+    }
+  }
+}

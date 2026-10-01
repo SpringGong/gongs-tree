@@ -1,0 +1,16 @@
+In the current open project folder, there is one tree-template.html file, which contains code to display a family tree, and the family tree data is in the data-tempalte.json file. 
+
+Please use them as the basis to convert it into a mobile app which can do the following:
+a. when the app start, it automatically read the data from the json file, and display it.
+
+APK location:
+C:\Springgh-20260921\Work\Spring-AI\gongs-tree\android\app\build\outputs\apk\debug\app-debug.apk
+(3.58 MB — ready to install on any Android 5.1+ device)
+
+To install on a phone, either:
+a. Copy the APK to the device and open it (enable "Install from unknown sources" in Settings → Security first), or
+b. Connect via USB and run: C:\Android\Sdk\platform-tools\adb.exe install app-debug.apk
+
+For future builds, just open a new terminal and run:
+cd C:\Springgh-20260921\Work\Spring-AI\gongs-tree\android
+gradlew.bat assembleDebug
