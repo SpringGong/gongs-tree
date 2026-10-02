@@ -501,8 +501,8 @@
       myDiagram = new go.Diagram('myDiagramDiv', {
         'animationManager.isEnabled': true,
         'draggingTool.isCopyEnabled': false,
-        initialDocumentSpot: go.Spot.Bottom,
-        initialViewportSpot: go.Spot.Bottom,
+        initialDocumentSpot: go.Spot.Center,
+        initialViewportSpot: go.Spot.Center,
         layout: $(GenogramLayout, { direction: 90, layerSpacing: 60, columnSpacing: 100 })
       });
 
@@ -695,7 +695,7 @@
 
           showLoading('数据装载进行中...');
           setTimeout(() => {
-            onceLayoutDone(() => { hideLoading(); showToast('数据已备份并更新 ✓'); });
+            onceLayoutDone(() => { centerOnRoots(); hideLoading(); showToast('数据已备份并更新 ✓'); });
             setupDiagram(myDiagram, data, data[0].key);
           }, 30);
         } catch {
@@ -760,6 +760,27 @@
       setTimeout(() => { overlay.style.display = 'none'; }, 350);
     }
 
+    function centerOnRoots() {
+      let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+      let found = false;
+      myDiagram.nodes.each(node => {
+        if (!node.data || node.isLinkLabel) return;
+        let hasParentLink = false;
+        node.findLinksInto().each(link => {
+          if (link.category === '') hasParentLink = true;
+        });
+        if (!hasParentLink) {
+          const b = node.actualBounds;
+          minX = Math.min(minX, b.x);
+          minY = Math.min(minY, b.y);
+          maxX = Math.max(maxX, b.right);
+          maxY = Math.max(maxY, b.bottom);
+          found = true;
+        }
+      });
+      if (found) myDiagram.centerRect(new go.Rect(minX, minY, maxX - minX, maxY - minY));
+    }
+
     function onceLayoutDone(callback) {
       const handler = () => {
         myDiagram.removeDiagramListener('LayoutCompleted', handler);
@@ -780,7 +801,7 @@
         showLoading('数据装载进行中...');
         // Defer one tick so the browser can repaint the overlay before heavy work.
         setTimeout(() => {
-          onceLayoutDone(() => { hideLoading(); showToast('族谱数据加载成功 ✓'); });
+          onceLayoutDone(() => { centerOnRoots(); hideLoading(); showToast('族谱数据加载成功 ✓'); });
           setupDiagram(myDiagram, data, data[0].key);
         }, 30);
       } catch (err) {
