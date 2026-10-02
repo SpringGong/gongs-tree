@@ -771,6 +771,7 @@
         });
         if (!hasParentLink) {
           const b = node.actualBounds;
+          if (b.width <= 0 || b.height <= 0) return;
           minX = Math.min(minX, b.x);
           minY = Math.min(minY, b.y);
           maxX = Math.max(maxX, b.right);
@@ -778,7 +779,13 @@
           found = true;
         }
       });
-      if (found) myDiagram.centerRect(new go.Rect(minX, minY, maxX - minX, maxY - minY));
+      if (found) {
+        // Reset to 1:1 scale so nodes render at readable size, then center on roots.
+        myDiagram.scale = 1;
+        myDiagram.centerRect(new go.Rect(minX, minY, maxX - minX, maxY - minY));
+      } else {
+        myDiagram.zoomToFit();
+      }
     }
 
     function onceLayoutDone(callback) {
