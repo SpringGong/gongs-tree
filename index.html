@@ -428,47 +428,65 @@
         const horiz = this.direction === 0.0 || this.direction === 180.0;
         const cs = this.columnSpacing || 50;
 
-        // Build map: marriage-label vertex → its direct child vertices in the layout network
-        const mlabToChildren = new Map();
-        this.network.vertexes.each(v => {
-          if (v.node && v.node.isLinkLabel) mlabToChildren.set(v, []);
-        });
-        this.network.edges.each(e => {
-          if (mlabToChildren.has(e.fromVertex)) {
-            mlabToChildren.get(e.fromVertex).push(e.toVertex);
-          }
-        });
+        // Build parent→children map; sort children by current position to
+        // preserve the ordering the base layout computed.
+        const childrenOf = new Map();
+        this.network.vertexes.each(v => childrenOf.set(v, []));
+        this.network.edges.each(e => childrenOf.get(e.fromVertex).push(e.toVertex));
+        childrenOf.forEach(ch => ch.sort((a, b) => horiz ? a.y - b.y : a.x - b.x));
 
-        // Group families by the parent marriage label's layer number
-        const byLayer = new Map();
-        mlabToChildren.forEach((children, mlabV) => {
-          if (children.length === 0) return;
-          if (!byLayer.has(mlabV.layer)) byLayer.set(mlabV.layer, []);
-          byLayer.get(mlabV.layer).push({ mlabV, children });
-        });
+        // Roots: vertices with no incoming edges (typically the founding couple).
+        const hasIncoming = new Set();
+        this.network.edges.each(e => hasIncoming.add(e.toVertex));
+        const roots = [];
+        this.network.vertexes.each(v => { if (!hasIncoming.has(v)) roots.push(v); });
+        roots.sort((a, b) => horiz ? a.y - b.y : a.x - b.x);
+        if (roots.length === 0) return;
 
-        // Process layers top-to-bottom so positional fixes cascade downward
-        Array.from(byLayer.keys()).sort((a, b) => a - b).forEach(layerNum => {
-          const families = byLayer.get(layerNum);
-          if (families.length < 2) return;
+        const getPos  = v => horiz ? v.y : v.x;
+        const setPos  = (v, val) => { if (horiz) v.y = val; else v.x = val; };
+        // Dummy vertices (multi-spouse cohort) have no node; treat as zero-width.
+        const getSize = v => !v.node ? 0 : (horiz ? v.height || 80 : v.width || 100);
 
-          // Sort sibling families left-to-right by their marriage label's position
-          families.sort((a, b) => horiz ? a.mlabV.y - b.mlabV.y : a.mlabV.x - b.mlabV.x);
+        // Phase 1 – bottom-up: compute the minimum horizontal span each subtree needs.
+        const subtreeSpan = new Map();
+        const seen1 = new Set();
+        const computeSpan = v => {
+          if (seen1.has(v)) return subtreeSpan.get(v) || getSize(v);
+          seen1.add(v);
+          const ch = childrenOf.get(v) || [];
+          if (ch.length === 0) { subtreeSpan.set(v, getSize(v)); return getSize(v); }
+          const total = ch.reduce((s, c) => s + computeSpan(c), 0) + cs * (ch.length - 1);
+          const span  = Math.max(getSize(v), total);
+          subtreeSpan.set(v, span);
+          return span;
+        };
+        roots.forEach(computeSpan);
 
-          const allChildren = families.flatMap(f => f.children);
-          // Start from the current leftmost child position
-          let cur = Math.min(...allChildren.map(v => horiz ? v.y : v.x));
+        // Phase 2 – top-down: assign positions so no two sibling subtrees overlap.
+        const seen2 = new Set();
+        const place = (v, start) => {
+          if (seen2.has(v)) return;
+          seen2.add(v);
+          const span   = subtreeSpan.get(v) || getSize(v);
+          const own    = getSize(v);
+          const centre = start + span / 2;
+          setPos(v, centre - own / 2);
 
-          // Assign positions family-by-family so children never interleave
-          families.forEach(({ children }) => {
-            children.sort((a, b) => horiz ? a.y - b.y : a.x - b.x);
-            children.forEach(cv => {
-              if (horiz) { cv.y = cur; cur += (cv.height || 80) + cs; }
-              else       { cv.x = cur; cur += (cv.width  || 100) + cs; }
+          const ch = childrenOf.get(v) || [];
+          if (ch.length > 0) {
+            const childTotal = ch.reduce((s, c) => s + (subtreeSpan.get(c) || getSize(c)), 0)
+                             + cs * (ch.length - 1);
+            let left = centre - childTotal / 2;
+            ch.forEach(c => {
+              place(c, left);
+              left += (subtreeSpan.get(c) || getSize(c)) + cs;
             });
-            cur += cs * 0.5; // visual gap between sibling families
-          });
-        });
+          }
+        };
+
+        let cur = Math.min(...roots.map(r => getPos(r)));
+        roots.forEach(r => { place(r, cur); cur += (subtreeSpan.get(r) || getSize(r)) + cs; });
       }
     }
 
