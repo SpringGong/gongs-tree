@@ -674,11 +674,11 @@
         try {
           const data = JSON.parse(reader.result);
           showLoading('数据装载进行中...');
-          onceLayoutDone(() => {
-            hideLoading();
-            showToast('数据导入成功 ✓');
-          });
-          setupDiagram(myDiagram, data, data[0].key);
+          // Defer one tick so the browser can repaint the overlay before heavy work.
+          setTimeout(() => {
+            onceLayoutDone(() => { hideLoading(); showToast('数据导入成功 ✓'); });
+            setupDiagram(myDiagram, data, data[0].key);
+          }, 30);
         } catch {
           showToast('JSON 格式错误，请检查文件');
         }
@@ -755,11 +755,11 @@
         if (!resp.ok) throw new Error('HTTP ' + resp.status);
         const data = await resp.json();
         showLoading('数据装载进行中...');
-        onceLayoutDone(() => {
-          hideLoading();
-          showToast('族谱数据加载成功 ✓');
-        });
-        setupDiagram(myDiagram, data, data[0].key);
+        // Defer one tick so the browser can repaint the overlay before heavy work.
+        setTimeout(() => {
+          onceLayoutDone(() => { hideLoading(); showToast('族谱数据加载成功 ✓'); });
+          setupDiagram(myDiagram, data, data[0].key);
+        }, 30);
       } catch (err) {
         console.warn('Auto-load failed:', err);
         hideLoading();
