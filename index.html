@@ -663,7 +663,13 @@
     }
 
     // ───────────────────────────────────────────────────────────────────────
-    // Manual file import (fallback)
+    // Persistent data storage (localStorage simulates data-template.json)
+    // ───────────────────────────────────────────────────────────────────────
+    const LS_DATA   = 'gongs_data_template';
+    const LS_BACKUP = 'gongs_data_template_backup';
+
+    // ───────────────────────────────────────────────────────────────────────
+    // Manual file import
     // ───────────────────────────────────────────────────────────────────────
     function readFile(input) {
       const file = input.files[0];
@@ -673,10 +679,23 @@
       reader.onload = () => {
         try {
           const data = JSON.parse(reader.result);
+
+          // Backup current data, then persist new data.
+          const existing = localStorage.getItem(LS_DATA);
+          if (existing) {
+            localStorage.setItem(LS_BACKUP, existing);
+          } else {
+            // First import: back up the bundled JSON asynchronously.
+            fetch('data-template.json')
+              .then(r => r.text())
+              .then(t => localStorage.setItem(LS_BACKUP, t))
+              .catch(() => {});
+          }
+          localStorage.setItem(LS_DATA, reader.result);
+
           showLoading('数据装载进行中...');
-          // Defer one tick so the browser can repaint the overlay before heavy work.
           setTimeout(() => {
-            onceLayoutDone(() => { hideLoading(); showToast('数据导入成功 ✓'); });
+            onceLayoutDone(() => { hideLoading(); showToast('数据已备份并更新 ✓'); });
             setupDiagram(myDiagram, data, data[0].key);
           }, 30);
         } catch {
@@ -751,9 +770,13 @@
 
     async function autoLoadData() {
       try {
-        const resp = await fetch('data-template.json');
-        if (!resp.ok) throw new Error('HTTP ' + resp.status);
-        const data = await resp.json();
+        // Prefer localStorage (written by file import) over the bundled JSON.
+        const saved = localStorage.getItem(LS_DATA);
+        const data = saved ? JSON.parse(saved)
+                           : await fetch('data-template.json').then(r => {
+                               if (!r.ok) throw new Error('HTTP ' + r.status);
+                               return r.json();
+                             });
         showLoading('数据装载进行中...');
         // Defer one tick so the browser can repaint the overlay before heavy work.
         setTimeout(() => {
