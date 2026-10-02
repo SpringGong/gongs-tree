@@ -230,6 +230,7 @@
         this.initializeOption = go.LayeredDigraphInit.WidthFirstIn;
         this.spouseSpacing = 30;
         this.isRouting = false;
+        this.aggressiveOption = go.LayeredDigraphAggressive.More;
       }
 
       makeNetwork(coll) {
@@ -370,6 +371,7 @@
 
       commitNodes() {
         super.commitNodes();
+        this._preventCrossing();
         this.network.vertexes.each(v => {
           if (v.node !== null && !v.node.isLinkLabel) v.node.position = new go.Point(v.x, v.y);
         });
@@ -421,6 +423,53 @@
         }
         return null;
       }
+
+      _preventCrossing() {
+        const horiz = this.direction === 0.0 || this.direction === 180.0;
+        const cs = this.columnSpacing || 50;
+
+        // Build map: marriage-label vertex → its direct child vertices in the layout network
+        const mlabToChildren = new Map();
+        this.network.vertexes.each(v => {
+          if (v.node && v.node.isLinkLabel) mlabToChildren.set(v, []);
+        });
+        this.network.edges.each(e => {
+          if (mlabToChildren.has(e.fromVertex)) {
+            mlabToChildren.get(e.fromVertex).push(e.toVertex);
+          }
+        });
+
+        // Group families by the parent marriage label's layer number
+        const byLayer = new Map();
+        mlabToChildren.forEach((children, mlabV) => {
+          if (children.length === 0) return;
+          if (!byLayer.has(mlabV.layer)) byLayer.set(mlabV.layer, []);
+          byLayer.get(mlabV.layer).push({ mlabV, children });
+        });
+
+        // Process layers top-to-bottom so positional fixes cascade downward
+        Array.from(byLayer.keys()).sort((a, b) => a - b).forEach(layerNum => {
+          const families = byLayer.get(layerNum);
+          if (families.length < 2) return;
+
+          // Sort sibling families left-to-right by their marriage label's position
+          families.sort((a, b) => horiz ? a.mlabV.y - b.mlabV.y : a.mlabV.x - b.mlabV.x);
+
+          const allChildren = families.flatMap(f => f.children);
+          // Start from the current leftmost child position
+          let cur = Math.min(...allChildren.map(v => horiz ? v.y : v.x));
+
+          // Assign positions family-by-family so children never interleave
+          families.forEach(({ children }) => {
+            children.sort((a, b) => horiz ? a.y - b.y : a.x - b.x);
+            children.forEach(cv => {
+              if (horiz) { cv.y = cur; cur += (cv.height || 80) + cs; }
+              else       { cv.x = cur; cur += (cv.width  || 100) + cs; }
+            });
+            cur += cs * 0.5; // visual gap between sibling families
+          });
+        });
+      }
     }
 
     // ───────────────────────────────────────────────────────────────────────
@@ -436,7 +485,7 @@
         'draggingTool.isCopyEnabled': false,
         initialDocumentSpot: go.Spot.Bottom,
         initialViewportSpot: go.Spot.Bottom,
-        layout: $(GenogramLayout, { direction: 90, layerSpacing: 50, columnSpacing: 50 })
+        layout: $(GenogramLayout, { direction: 90, layerSpacing: 60, columnSpacing: 100 })
       });
 
       const colors = {
