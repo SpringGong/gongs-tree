@@ -501,8 +501,6 @@
       myDiagram = new go.Diagram('myDiagramDiv', {
         'animationManager.isEnabled': true,
         'draggingTool.isCopyEnabled': false,
-        initialDocumentSpot: go.Spot.Center,
-        initialViewportSpot: go.Spot.Center,
         layout: $(GenogramLayout, { direction: 90, layerSpacing: 60, columnSpacing: 100 })
       });
 
@@ -780,9 +778,11 @@
         }
       });
       if (found) {
-        // Reset to 1:1 scale so nodes render at readable size, then center on roots.
         myDiagram.scale = 1;
-        myDiagram.centerRect(new go.Rect(minX, minY, maxX - minX, maxY - minY));
+        const cx = (minX + maxX) / 2;
+        const cy = (minY + maxY) / 2;
+        const vb = myDiagram.viewportBounds;
+        myDiagram.position = new go.Point(cx - vb.width / 2, cy - vb.height / 2);
       } else {
         myDiagram.zoomToFit();
       }
@@ -791,7 +791,10 @@
     function onceLayoutDone(callback) {
       const handler = () => {
         myDiagram.removeDiagramListener('LayoutCompleted', handler);
-        callback();
+        // Defer to the next event-loop tick so GoJS finishes all
+        // post-layout work (initial scroll, isInitial flag, etc.)
+        // before we reposition the viewport.
+        setTimeout(callback, 0);
       };
       myDiagram.addDiagramListener('LayoutCompleted', handler);
     }
