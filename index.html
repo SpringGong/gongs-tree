@@ -673,8 +673,12 @@
       reader.onload = () => {
         try {
           const data = JSON.parse(reader.result);
+          showLoading('数据装载进行中...');
+          onceLayoutDone(() => {
+            hideLoading();
+            showToast('数据导入成功 ✓');
+          });
           setupDiagram(myDiagram, data, data[0].key);
-          showToast('数据导入成功 ✓');
         } catch {
           showToast('JSON 格式错误，请检查文件');
         }
@@ -724,10 +728,25 @@
     // ───────────────────────────────────────────────────────────────────────
     // Auto-load data-template.json on startup
     // ───────────────────────────────────────────────────────────────────────
+    function showLoading(message) {
+      const overlay = document.getElementById('loading-overlay');
+      overlay.querySelector('.loading-sub').textContent = message;
+      overlay.classList.remove('fade-out');
+      overlay.style.display = '';
+    }
+
     function hideLoading() {
       const overlay = document.getElementById('loading-overlay');
       overlay.classList.add('fade-out');
       setTimeout(() => { overlay.style.display = 'none'; }, 350);
+    }
+
+    function onceLayoutDone(callback) {
+      const handler = () => {
+        myDiagram.removeDiagramListener('LayoutCompleted', handler);
+        callback();
+      };
+      myDiagram.addDiagramListener('LayoutCompleted', handler);
     }
 
     async function autoLoadData() {
@@ -735,9 +754,12 @@
         const resp = await fetch('data-template.json');
         if (!resp.ok) throw new Error('HTTP ' + resp.status);
         const data = await resp.json();
+        showLoading('数据装载进行中...');
+        onceLayoutDone(() => {
+          hideLoading();
+          showToast('族谱数据加载成功 ✓');
+        });
         setupDiagram(myDiagram, data, data[0].key);
-        hideLoading();
-        showToast('族谱数据加载成功 ✓');
       } catch (err) {
         console.warn('Auto-load failed:', err);
         hideLoading();
