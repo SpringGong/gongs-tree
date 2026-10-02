@@ -693,7 +693,7 @@
 
           showLoading('数据装载进行中...');
           setTimeout(() => {
-            onceLayoutDone(() => { centerOnRoots(); hideLoading(); showToast('数据已备份并更新 ✓'); });
+            onceLayoutDone(() => { centerOnNode(data[0].key); hideLoading(); showToast('数据已备份并更新 ✓'); });
             setupDiagram(myDiagram, data, data[0].key);
           }, 30);
         } catch {
@@ -758,6 +758,18 @@
       setTimeout(() => { overlay.style.display = 'none'; }, 350);
     }
 
+    function centerOnNode(key) {
+      const node = myDiagram.findNodeForKey(key);
+      if (node && node.actualBounds.width > 0 && node.actualBounds.height > 0) {
+        myDiagram.scale = 1;
+        const b = node.actualBounds;
+        const vb = myDiagram.viewportBounds;
+        myDiagram.position = new go.Point(b.centerX - vb.width / 2, b.centerY - vb.height / 2);
+      } else {
+        centerOnRoots();
+      }
+    }
+
     function centerOnRoots() {
       let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
       let found = false;
@@ -811,7 +823,7 @@
         showLoading('数据装载进行中...');
         // Defer one tick so the browser can repaint the overlay before heavy work.
         setTimeout(() => {
-          onceLayoutDone(() => { centerOnRoots(); hideLoading(); showToast('族谱数据加载成功 ✓'); });
+          onceLayoutDone(() => { centerOnNode(data[0].key); hideLoading(); showToast('族谱数据加载成功 ✓'); });
           setupDiagram(myDiagram, data, data[0].key);
         }, 30);
       } catch (err) {
