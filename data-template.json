@@ -1,48 +1,27 @@
-[
-{"key":502,"name": "世斌","order": "次子","mother":null,"father":null,"gender": "M","birthtime": "光绪壬辰年六月廿四日亥时","birthplace": "南薰乡染房村禾苗屋基", "deathtime": "民国十二年三月二十一日午时", "buryplace": "屋基宅后丁山癸向" },
-{"key":503,"name": "郑氏","husband":502,"gender": "F","birthtime": "光绪乙丑年三月十二酉时","birthplace": "出生地点不详", "deathtime": "己辛年三月廿八未时", "buryplace": "火烧湾生函左侧", "comment": "生二子" },
-{"key":504,"name": "泽珍","order": "长子","mother":503,"father":502,"gender": "M","birthtime": "民国壬子年八月十二日辰时","birthplace": "染房村禾苗屋基", "deathtime": "1959年腊月廿三日巳时", "buryplace": "禾苗屋基宅后丁山癸" },
-{"key":505,"name": "李光仙","husband":504,"gender": "F","birthtime": "民国丁巳年九月十一巳时","birthplace": "竹家庙大塘沽", "deathtime": "1995年九月初十", "buryplace": "火烧湾丁山癸", "comment": "生四子一女" },
-{"key":506,"name": "长智","order": "长子","mother":505,"father":504,"gender": "M","birthtime": "1939己卯年正月廿三寅时","birthplace": "染房村禾苗屋基" },
-{"key":507,"name": "孙善玉","husband":506,"gender": "F","birthtime": "1945乙酉年腊月十四子时","birthplace": "石坝子村五通庙孙家湾", "deathtime": "2019己亥年正月初一戌时", "buryplace": "火烧湾丁山癸向", "comment": "生三子" },
-{"key":508,"name": "凤燚","alias": "累崇艺","order": "长子","mother":507,"father":506,"gender": "M","birthtime": "1969年十月初四辰时","birthplace": "染房村禾苗屋基", "comment": "抱与姑母唐长芳，跟姑父雷荣宏姓" },
-{"key":509,"name": "徐萍","husband":508,"gender": "F","birthtime": "1970年十月十三申时","birthplace": "昭通市南城区", "comment": "生一女" },
-{"key":510,"name": "雷雪婧","mother":509,"father":508,"gender": "F","birthtime": "1999己卯年五月初三巳时","birthplace": "昭通市东城区" },
-{"key":511,"name": "凤钰","order": "次子","mother":507,"father":506,"gender": "M","birthtime": "1973癸丑年正月廿三日辰时","birthplace": "染房村禾苗屋基" },
-{"key":512,"name": "雷翠琴","husband":511,"gender": "F","birthtime": "1973癸丑年七月十九申时","birthplace": "天林八大队玉河桥雷家沟", "comment": "生一子一女" },
-{"key":513,"name": "麟玲","order": "长女","mother":512,"father":511,"gender": "F","birthtime": "1995乙亥年九月初四午时","birthplace": "攀枝花炳草岗" },
-{"key":514,"name": "振","mother":512,"father":511,"gender": "M","birthtime": "2002壬午年六月廿一未时","birthplace": "攀枝花炳草岗" },
-{"key":515,"name": "凤艺","alias": "凤骥","order": "三子","mother":507,"father":506,"gender": "M","birthtime": "1975乙卯年冬月十九未时","birthplace": "染房村禾苗屋基" },
-{"key":516,"name": "姚氏","husband":515,"gender": "F","birthtime": "1979己未年九月初四辰时","birthplace": "新疆阿克苏农一师二团十三连", "comment": "离异" },
-{"key":517,"name": "姚心怡","mother":516,"father":515,"gender": "F","birthtime": "2011辛卯年3月15日午时（农历二月十一）","birthplace": "上海浦东妇幼保健院", "comment": "父母离异后，跟母亲生活" },
-{"key":518,"name": "刘丽","husband":515,"gender": "F","birthtime": "1985年8月14日卯时（农历六月廿八）","birthplace": "湖北荆州公安县" },
-{"key":519,"name": "长义","order": "次子","mother":505,"father":504,"gender": "M","birthtime": "1941年冬月二十三辰时","birthplace": "染房村禾苗屋基" },
-{"key":520,"name": "李代凤","husband":519,"gender": "F","birthtime": "1946年六月十四","birthplace": "水口庙郭家沟", "deathtime": "1991年", "comment": "生一子二女" },
-{"key":521,"name": "凤国","order": "长子","mother":520,"father":519,"gender": "M","birthtime": "1969己酉年四月初一午时","birthplace": "染房村禾苗屋基" },
-{"key":522,"name": "刘婷","husband":521,"gender": "F","birthtime": "1970年二月初九寅时","birthplace": "染房村禾苗屋基", "comment": "生一子" },
-{"key":523,"name": "记","alias": "麟林，小林","mother":522,"father":521,"gender": "M","birthtime": "1989年四月初三子时","birthplace": "染房村禾苗屋基" },
-{"key":524,"name": "陈语嫣","husband":523,"gender": "F","birthtime": "1993年","birthplace": "四川自贡" },
-{"key":525,"name": "卿航","alias": "先航","mother":524,"father":523,"gender": "M","birthtime": "出生时间不详","birthplace": "成都" },
-{"key":526,"name": "凤琼","order": "大女","mother":520,"father":519,"gender": "F","birthtime": "出生时间不详","birthplace": "染房村禾苗屋基" },
-{"key":527,"name": "凤英","order": "二女","mother":520,"father":519,"gender": "F","birthtime": "出生时间不详","birthplace": "染房村禾苗屋基" },
-{"key":528,"name": "长芳","mother":505,"father":504,"gender": "F","birthtime": "1945乙酉年四月廿五日","birthplace": "染房村禾苗屋基", "comment": "嫁给雷荣宏，没有开怀，抱养大哥的长子凤燚（改名为雷崇艺）" },
-{"key":529,"name": "长明","order": "四子","mother":505,"father":504,"gender": "M","birthtime": "1955乙未年腊月十二午时","birthplace": "染房村禾苗屋基" },
-{"key":530,"name": "刘子林","husband":529,"gender": "F","birthtime": "1960年九月初二巳时","birthplace": "十一大队", "deathtime": "2015年6月", "buryplace": "禾苗屋基宅后", "comment": "生二子" },
-{"key":531,"name": "凤鑫","order": "长子","mother":530,"father":529,"gender": "M","birthtime": "1983癸亥年四月十五戍时","birthplace": "染房村禾苗屋基" },
-{"key":532,"name": "凤建","order": "次子","mother":530,"father":529,"gender": "M","birthtime": "1988戊辰年二月初四辰时","birthplace": "染房村禾苗屋基" },
-{"key":533,"name": "长寿","order": "五子","mother":505,"father":504,"gender": "M","birthtime": "1959己亥年正月十四辰时","birthplace": "染房村禾苗屋基" },
-{"key":534,"name": "张艳宁","husband":533,"gender": "F","birthtime": "1959己亥年六月初三巳时","birthplace": "资中县龙江区铁佛五队", "comment": "生一子" },
-{"key":535,"name": "培","alias": "凤尧","mother":534,"father":533,"gender": "M","birthtime": "1983癸亥年八月廿九寅时","birthplace": "安岳县永丰乡" },
-{"key":536,"name": "戴雯雯","husband":535,"gender": "F","birthtime": "1982年腊月十七卯时（凌晨六点多）","birthplace": "新疆拜城县", "comment": "生二子" },
-{"key":537,"name": "泽备","order": "次子","mother":503,"father":502,"gender": "M","birthtime": "1913年","birthplace": "染房村禾苗屋基", "deathtime": "1943年", "buryplace": "山东腾县", "comment": "1939年被拉壮丁，加入川军团远征军，赴印度抗日，回国后升任连长，1943年山东抗日战场牺牲" },
-{"key":538,"name": "孙氏","husband":537,"gender": "F","birthtime": "1913年","birthplace": "石坝子村", "deathtime": "1947年八月廿七", "buryplace": "禾苗屋基平洋土", "comment": "生一子" },
-{"key":539,"name": "长能","mother":538,"father":537,"gender": "M","birthtime": "1937年腊月初二辰时","birthplace": "染房村禾苗屋基", "buryplace": "周礼区" },
-{"key":540,"name": "邓崇菊","husband":539,"gender": "F","birthtime": "1937年冬月十三戌时","birthplace": "拱桥乡向家庙", "buryplace": "周礼区", "comment": "生一子三女" },
-{"key":541,"name": "琼","order": "长女","mother":540,"father":539,"gender": "F","birthtime": "1963年十一月初四寅时","birthplace": "染房村禾苗屋基" },
-{"key":542,"name": "萍","order": "三女","mother":540,"father":539,"gender": "F","birthtime": "1965年十一月初十卯时","birthplace": "染房村禾苗屋基" },
-{"key":543,"name": "春","order": "四女","mother":540,"father":539,"gender": "F","birthtime": "1969年正月十九辰时","birthplace": "染房村禾苗屋基" },
-{"key":544,"name": "宁","order": "幺儿","mother":540,"father":539,"gender": "M","birthtime": "1972年三月十二巳时","birthplace": "染房村禾苗屋基" },
-{"key":545,"name": "杨清艳","husband":544,"gender": "F","birthtime": "1978年九月廿五丑时","birthplace": "射洪县官升镇" },
-{"key":564,"name": "子皓","alias": "麟皓","order": "长子","mother":536,"father":535,"gender": "M","birthtime": "2010年九月廿六申时","birthplace": "武汉" },
-{"key":565,"name": "一玮","alias": "麟玮","order": "次子","mother":536,"father":535,"gender": "M","birthtime": "2014年十月十一申时","birthplace": "武汉" }
-]
+    [  
+      { "key": 0,   "name": "李渊",   "gender": "M",  "mother": null,   "father": null,   "wife": 1,        "birthtime": "隋朝566年4月7日,北周武帝天和元年三月初二日", "birthplace": "陇西成纪人",  "deathtime": "635年6月25日（69岁）唐太宗贞观九年五月初六日",  "buryplace": "唐献陵", "comment": "字叔德，唐朝开国皇帝。庙号：高祖，年号：武德，618－626年；谥号：太武皇帝" },
+      { "key": 1,   "name": "窦氏",   "gender": "F",  "mother": 3,   "father": 2,   "husband": 0,     "birthtime": "隋朝573年之前", "birthplace": "京兆郡始平县（今陕西省兴平市）",  "deathtime": "隋朝617年之前",  "buryplace": "涿郡", "comment": "太穆皇后" },
+
+      { "key": 2,   "name": "窦毅",   "gender": "M",  "mother": 12,      "father": 4,      "wife": 3,        "birthtime": "北魏 519年", "birthplace": "扶风郡平陵县（今陕西省咸阳市秦都区）",  "deathtime": "583年1月3日",  "buryplace": "葬地不详", "comment": "窦毅是一位佛教徒，曾经建造云华寺。祖籍河南郡洛阳县（今河南省洛阳市东）" },
+      { "key": 3,   "name": "襄阳公主", "gender": "F",  "mother": null,   "father": null,   "husband": 2,     "birthtime": "北周：出生时间不详", "birthplace": "代郡武川镇（今内蒙古自治区呼和浩特市武川县）",  "deathtime": "去世时间不详",  "buryplace": "葬地不详", "comment": "追尊周文帝宇文泰第五女，生母不详" },
+      { "key": 4,   "name": "窦岳",   "gender": "M",  "mother": null,      "father": null,              "birthtime": "北魏：出生时间不详", "birthplace": "扶风平陵（今陕西凤翔）",  "deathtime": "去世时间不详",  "buryplace": "葬地不详", "comment": "辽东公窦祐的曾孙，辽东穆公窦岩之孙，北魏建昌孝公窦略的第三子" },
+
+      { "key": 5,   "name": "李世民", "order": "嫡次子",  "gender": "M",  "mother": 1,   "father": 0,        "birthtime": "598年1月28日，隋文帝开皇十七年十二月二十二日", "birthplace": "隋朝岐州武功县庆善宫（今陕西省咸阳市武功县）",  "deathtime": "649年7月10日，贞观二十三年五月二十六日",  "buryplace": "唐昭陵（今陕西省咸阳市礼泉县）", "comment": "唐朝第一任宰相、第二任皇帝。唐高祖李渊次子" },
+      { "key": 6,   "name": "长孙皇后",   "gender": "F",  "mother": null,   "father": null,   "husband": 5,     "birthtime": "隋仁寿元年二月初六日（601年3月15日）", "birthplace": "长安",  "deathtime": "唐贞观十年六月二十一日（636年7月28日），35岁",  "buryplace": "唐昭陵", "comment": "长孙皇后先世是鲜卑拔拔氏，北魏帝室十姓之一，魏孝文帝时汉化改革，改为长孙氏。" },
+      { "key": 7,   "name": "李承乾", "alias": "字高明", "order": "嫡长子",     "gender": "M",  "mother": 6,      "father": 5,      "birthtime": "619年，唐高祖武德二年", "birthplace": "长安城-太极宫-承乾殿",  "deathtime": "645年1月4日，唐太宗贞观十八年，26岁",  "buryplace": "黔州", "comment": "唐朝贞观年间的首任太子，在任期间多年监国，于贞观十七年被废黜，开元二十七年被追封为恒山王，谥号愍" },
+      { "key": 8,   "name": "李泰",   "order": "嫡二子，第四子", "gender": "M",  "mother": 6,      "father": 5,           "birthtime": "620年，唐高祖武德三年", "birthplace": "长安城-太极宫-承乾殿",  "deathtime": "653年1月20日，唐高宗永徽四年，33岁",  "buryplace": "郧乡", "comment": "字惠褒，小字青雀，唐太宗第四子，母长孙皇后。雅好文学，擅书法，工于草行，集书万卷，是当时的书画鉴赏家" },
+      { "key": 9,   "name": "李治",   "alias": "小名雉奴，字为善", "order": "嫡三子，第九子", "gender": "M",  "mother": 6,      "father": 5,             "birthtime": "628年7月21日，唐太宗贞观二年六月十五日", "birthplace": "长安城东宫丽正殿",  "deathtime": "683年12月27日，弘道元年十二月初四日，55岁",  "buryplace": "唐乾陵", "comment": "小名雉奴，字为善，唐朝第三任皇帝，唐太宗李世民第九子、嫡三子" },
+
+      { "key": 10,  "name": "李建成", "order": "嫡长子",    "gender": "M",  "mother": 1,      "father": 0,      "birthtime": "589年，隋文帝开皇九年", "birthplace": "陇西成纪（今甘肃秦安西北）",  "deathtime": "626年7月2日，唐高祖武德九年，36-37岁",  "buryplace": "葬地不详", "comment": "中国唐朝高祖李渊嫡长子。本为唐高祖太子，后被其弟李世民发动玄武门之变，以箭射死" },
+      { "key": 11,  "name": "李元吉", "order": "嫡四子",    "gender": "M",  "mother": 1,      "father": 0,      "birthtime": "603年，隋文帝仁寿三年", "birthplace": "出生地不详",  "deathtime": "626年7月2日，唐高祖武德九年，22-23岁",  "buryplace": "葬地不详", "comment": "中国唐朝唐高祖的第四子，也是嫡四子。死于玄武门之变" },
+
+      { "key": 12,   "name": "无名氏",   "gender": "F",  "mother": null,   "father": null,     "husband": 4,     "birthtime": "北魏：出生时间不详", "birthplace": "出生地不详",  "deathtime": "去世时间不详",  "buryplace": "葬地不详", "comment": "窦毅母亲，窦太后祖母" },
+      
+      { "key": 13,   "name": "平阳公主",  "order": "嫡三女", "gender": "F",  "mother": 1,   "father": 0,        "birthtime": "589－598年间，隋朝开皇年间", "birthplace": "出生地不详",  "deathtime": "武德六年 623年",  "buryplace": "葬地不详", "comment": "唐高祖李渊第三女，生母太穆皇后" },
+      
+      { "key": 14,   "name": "李玄霸",  "order": "嫡三子",  "gender": "M",  "mother": 1,   "father": 0,        "birthtime": "599年", "birthplace": "出生地不详",  "deathtime": "614年，隋朝大业十年",  "buryplace": "葬地不详", "comment": "字大德，唐高祖李渊第三子，获封为卫怀王，传因意外落马而亡，得年十六，没有儿女。" },
+
+      { "key": 15,   "name": "孙嫔",   "gender": "F",  "mother": null,   "father": null, "husband": 0,       "birthtime": "出生地不详", "birthplace": "出生地不详",  "deathtime": "去世时间不详",  "buryplace": "葬地不详", "comment": "唐朝妃嫔，唐高祖李渊的嫔" },
+      { "key": 16,   "name": "李元昌",   "order": "第七子", "gender": "M",  "mother": 15,   "father": 0,        "birthtime": "619年，唐高祖武德二年", "birthplace": "出生地不详",  "deathtime": "643年4月29日，25岁",  "buryplace": "葬地不详", "comment": "唐高祖第七子，母孙嫔。贞观十七年（643年）四月，与太子李承乾、汉王李元昌、兵部尚书侯君集等阴谋发动政变，事败，后自尽于家中" }
+    ]
+    

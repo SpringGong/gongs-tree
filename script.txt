@@ -14,3 +14,26 @@ b. Connect via USB and run: C:\Android\Sdk\platform-tools\adb.exe install app-de
 For future builds, just open a new terminal and run:
 cd C:\Springgh-20260921\Work\Spring-AI\gongs-tree\android
 gradlew.bat assembleDebug
+
+
+The IPA has been downloaded directly to your computer. No need to navigate GitHub at all.
+
+IPA location:
+
+
+C:\Springgh-20260921\Work\Spring-AI\gongs-tree\ios-output\App.ipa
+To install it on your iPhone, use one of these tools on your PC:
+
+Tool	Link	Notes
+Sideloadly	sideloadly.io	Easiest — drag & drop the IPA, connect iPhone via Wifi
+
+Download and install Sideloadly
+https://github.com/iOS17/sideloadly
+Note: Sideloadly needs the iTunes not from Microsoft Store, but here: https://www.apple.com/itunes/download/win64
+
+in the current openned project, the index.html makes the title and toolbar at the top of the screen, after convert it into iOS app, the title and the toolbar at the same place as the dynamic island of iPhone, which makes me could not touch the toolbar, please adjust it
+
+
+When import data via the File Import button, please add new logic to do the following:
+1. create a backup of the data-template.json as data-template-backup.json.
+2. use the new imported data to overwrite the data inside data-template.json
