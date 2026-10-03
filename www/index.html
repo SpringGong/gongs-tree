@@ -1073,39 +1073,51 @@
       const node   = myDiagram.findNodeForKey(key);
       if (!node) { closeEditForm(); return; }
 
-      const get = id => document.getElementById(id).value.trim();
-      // Returns the trimmed string, or undefined when empty (so getNodeInfo skips it).
-      const opt = id => get(id) || undefined;
+      // Capture form values NOW before closing the modal.
+      const val = id => document.getElementById(id).value.trim();
+      const newName      = val('edit-name');
+      const newGender    = val('edit-gender');
+      const newBirthtime = val('edit-birthtime')  || undefined;
+      const newAlias     = val('edit-alias')       || undefined;
+      const newOrder     = val('edit-order')       || undefined;
+      const newBirthpl   = val('edit-birthplace')  || undefined;
+      const newDeathtime = val('edit-deathtime')   || undefined;
+      const newBurypl    = val('edit-buryplace')   || undefined;
+      const newComment   = val('edit-comment')     || undefined;
 
-      const model = myDiagram.model;
-      const d     = node.data;
-
-      model.startTransaction('editNode');
-      const newName = get('edit-name');
-      if (newName) model.setDataProperty(d, 'name', newName);
-      model.setDataProperty(d, 'gender',     get('edit-gender'));
-      model.setDataProperty(d, 'birthtime',  opt('edit-birthtime'));
-      model.setDataProperty(d, 'alias',      opt('edit-alias'));
-      model.setDataProperty(d, 'order',      opt('edit-order'));
-      model.setDataProperty(d, 'birthplace', opt('edit-birthplace'));
-      model.setDataProperty(d, 'deathtime',  opt('edit-deathtime'));
-      model.setDataProperty(d, 'buryplace',  opt('edit-buryplace'));
-      model.setDataProperty(d, 'comment',    opt('edit-comment'));
-      model.commitTransaction('editNode');
-      // Force-refresh all bindings on the node (covers the getNodeInfo converter).
-      node.updateTargetBindings();
-
-      // Persist the updated model to localStorage, stripping LinkLabel helper nodes
-      // and any GoJS-internal properties.
-      const clean = myDiagram.model.nodeDataArray
-        .filter(nd => nd.category !== 'LinkLabel')
-        .map(nd => Object.fromEntries(
-          Object.entries(nd).filter(([k, v]) => !k.startsWith('_') && v !== undefined)
-        ));
-      localStorage.setItem(LS_DATA, JSON.stringify(clean));
-
+      // Close modal and show loading overlay so the user knows to wait.
       closeEditForm();
-      showToast('保存成功 ✓');
+      showLoading('正在保存数据，请稍候...');
+
+      // Defer heavy work (GoJS transaction + JSON serialisation) one tick
+      // so the browser can repaint and show the loading overlay first.
+      setTimeout(() => {
+        const model = myDiagram.model;
+        const d     = node.data;
+
+        model.startTransaction('editNode');
+        if (newName) model.setDataProperty(d, 'name', newName);
+        model.setDataProperty(d, 'gender',     newGender);
+        model.setDataProperty(d, 'birthtime',  newBirthtime);
+        model.setDataProperty(d, 'alias',      newAlias);
+        model.setDataProperty(d, 'order',      newOrder);
+        model.setDataProperty(d, 'birthplace', newBirthpl);
+        model.setDataProperty(d, 'deathtime',  newDeathtime);
+        model.setDataProperty(d, 'buryplace',  newBurypl);
+        model.setDataProperty(d, 'comment',    newComment);
+        model.commitTransaction('editNode');
+        node.updateTargetBindings();
+
+        const clean = myDiagram.model.nodeDataArray
+          .filter(nd => nd.category !== 'LinkLabel')
+          .map(nd => Object.fromEntries(
+            Object.entries(nd).filter(([k, v]) => !k.startsWith('_') && v !== undefined)
+          ));
+        localStorage.setItem(LS_DATA, JSON.stringify(clean));
+
+        hideLoading();
+        showToast('数据保存成功 ✓');
+      }, 50);
     }
 
     function centerOnNode(key) {
