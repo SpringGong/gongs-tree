@@ -188,6 +188,166 @@
     #toast.show {
       transform: translateX(-50%) translateY(0);
     }
+
+    /* ─── Context menu ───────────────────────── */
+    #node-context-menu {
+      position: fixed;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.15), 0 1px 4px rgba(0,0,0,0.1);
+      overflow: hidden;
+      display: none;
+      z-index: 900;
+      min-width: 130px;
+    }
+
+    .ctx-item {
+      padding: 14px 22px;
+      font-size: 16px;
+      color: #1e293b;
+      cursor: pointer;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .ctx-item:hover  { background: #f1f5f9; }
+    .ctx-item:active { background: #e2e8f0; }
+
+    /* ─── Edit modal ─────────────────────────── */
+    #edit-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.4);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 16px;
+      padding-top:    max(16px, env(safe-area-inset-top));
+      padding-bottom: max(16px, env(safe-area-inset-bottom));
+    }
+
+    .edit-dialog {
+      background: white;
+      border-radius: 16px;
+      width: 100%;
+      max-width: 460px;
+      max-height: 88vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.22);
+    }
+
+    .edit-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 20px 14px;
+      border-bottom: 1px solid #e2e8f0;
+      flex-shrink: 0;
+    }
+
+    .edit-header span {
+      font-size: 17px;
+      font-weight: 600;
+      color: #1e293b;
+    }
+
+    .edit-close {
+      background: #f1f5f9;
+      border: none;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      font-size: 14px;
+      cursor: pointer;
+      color: #64748b;
+      line-height: 1;
+    }
+
+    .edit-close:active { background: #e2e8f0; }
+
+    .edit-body {
+      overflow-y: auto;
+      padding: 16px 20px;
+      flex: 1;
+    }
+
+    .field-row { margin-bottom: 14px; }
+
+    .field-row label {
+      display: block;
+      font-size: 13px;
+      color: #64748b;
+      font-weight: 500;
+      margin-bottom: 5px;
+    }
+
+    .field-row input,
+    .field-row select,
+    .field-row textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1.5px solid #cbd5e0;
+      border-radius: 8px;
+      font-size: 15px;
+      font-family: inherit;
+      color: #1e293b;
+      background: #f8fafc;
+      outline: none;
+      -webkit-appearance: none;
+      transition: border-color 0.15s;
+    }
+
+    .field-row input:focus,
+    .field-row select:focus,
+    .field-row textarea:focus {
+      border-color: #5d8cc1;
+      background: white;
+    }
+
+    .field-row textarea {
+      resize: vertical;
+      min-height: 72px;
+    }
+
+    .edit-footer {
+      display: flex;
+      gap: 10px;
+      padding: 14px 20px;
+      border-top: 1px solid #e2e8f0;
+      flex-shrink: 0;
+    }
+
+    .btn-cancel {
+      flex: 1;
+      padding: 12px;
+      background: #f1f5f9;
+      border: none;
+      border-radius: 10px;
+      font-size: 15px;
+      font-family: inherit;
+      font-weight: 500;
+      color: #64748b;
+      cursor: pointer;
+    }
+
+    .btn-cancel:active { background: #e2e8f0; }
+
+    .btn-save {
+      flex: 2;
+      padding: 12px;
+      background: #5d8cc1;
+      border: none;
+      border-radius: 10px;
+      font-size: 15px;
+      font-family: inherit;
+      font-weight: 600;
+      color: white;
+      cursor: pointer;
+    }
+
+    .btn-save:active { background: #4a7ab0; }
   </style>
 </head>
 <body>
@@ -205,6 +365,7 @@
   <!-- Header bar -->
   <div id="app-header">
     <h1>白水电子族谱</h1>
+    <button class="header-btn" id="export-btn" title="导出 JSON 数据文件">📤</button>
     <label for="choose-file" class="header-btn" title="导入 JSON 数据文件">📂</label>
     <input type="file" id="choose-file" accept="application/json,.json" style="display:none">
   </div>
@@ -218,6 +379,67 @@
 
   <!-- GoJS diagram fills remaining height -->
   <div id="myDiagramDiv"></div>
+
+  <!-- Node context menu (right-click / long-press) -->
+  <div id="node-context-menu">
+    <div class="ctx-item" id="ctx-edit">编辑</div>
+  </div>
+
+  <!-- Edit form modal -->
+  <div id="edit-modal">
+    <div class="edit-dialog">
+      <div class="edit-header">
+        <span>编辑成员信息</span>
+        <button class="edit-close" id="edit-close-btn">✕</button>
+      </div>
+      <div class="edit-body">
+        <input type="hidden" id="edit-node-key">
+        <div class="field-row">
+          <label>姓名</label>
+          <input type="text" id="edit-name" placeholder="姓名（必填）">
+        </div>
+        <div class="field-row">
+          <label>性别</label>
+          <select id="edit-gender">
+            <option value="M">男</option>
+            <option value="F">女</option>
+          </select>
+        </div>
+        <div class="field-row">
+          <label>出生年份</label>
+          <input type="text" id="edit-birthtime" placeholder="如 1950">
+        </div>
+        <div class="field-row">
+          <label>字号 / 别名</label>
+          <input type="text" id="edit-alias" placeholder="字号或别名">
+        </div>
+        <div class="field-row">
+          <label>排行</label>
+          <input type="text" id="edit-order" placeholder="排行">
+        </div>
+        <div class="field-row">
+          <label>出生地</label>
+          <input type="text" id="edit-birthplace" placeholder="出生地">
+        </div>
+        <div class="field-row">
+          <label>卒年</label>
+          <input type="text" id="edit-deathtime" placeholder="如 2010">
+        </div>
+        <div class="field-row">
+          <label>葬地</label>
+          <input type="text" id="edit-buryplace" placeholder="葬地">
+        </div>
+        <div class="field-row">
+          <label>备注</label>
+          <textarea id="edit-comment" placeholder="备注信息"></textarea>
+        </div>
+      </div>
+      <div class="edit-footer">
+        <button class="btn-cancel" id="edit-cancel-btn">取消</button>
+        <button class="btn-save" id="edit-save-btn">保存</button>
+      </div>
+    </div>
+  </div>
 
   <script src="https://unpkg.com/gojs@3.0.4/release/go.js"></script>
   <script>
@@ -563,6 +785,20 @@
         $(go.Shape, { strokeWidth: 3, stroke: colors.blue })
         )
       );
+
+      // Show custom context menu on right-click (desktop) or long-press (mobile).
+      // GoJS fires ObjectContextClicked for both interactions automatically.
+      myDiagram.addDiagramListener('ObjectContextClicked', function(e) {
+        const part = e.subject.part;
+        if (!(part instanceof go.Node) || part.data.category === 'LinkLabel') return;
+        const rect = myDiagram.div.getBoundingClientRect();
+        const vp   = e.diagram.lastInput.viewPoint;
+        showContextMenu(part, rect.left + vp.x, rect.top + vp.y);
+      });
+
+      // Clicking the diagram background dismisses the menu.
+      myDiagram.addDiagramListener('BackgroundSingleClicked', hideContextMenu);
+      myDiagram.addDiagramListener('ObjectSingleClicked',     hideContextMenu);
     }
 
     // ───────────────────────────────────────────────────────────────────────
@@ -758,6 +994,114 @@
       setTimeout(() => { overlay.style.display = 'none'; }, 350);
     }
 
+    // ───────────────────────────────────────────────────────────────────────
+    // Context menu
+    // ───────────────────────────────────────────────────────────────────────
+    let _ctxNode = null;
+
+    function showContextMenu(node, x, y) {
+      _ctxNode = node;
+      const menu = document.getElementById('node-context-menu');
+      menu.style.display = 'block';
+      // Clamp so the menu never bleeds off-screen.
+      requestAnimationFrame(() => {
+        const mw = menu.offsetWidth;
+        const mh = menu.offsetHeight;
+        menu.style.left = Math.min(x, window.innerWidth  - mw - 8) + 'px';
+        menu.style.top  = Math.min(y, window.innerHeight - mh - 8) + 'px';
+      });
+    }
+
+    function hideContextMenu() {
+      document.getElementById('node-context-menu').style.display = 'none';
+    }
+
+    // ───────────────────────────────────────────────────────────────────────
+    // Export
+    // ───────────────────────────────────────────────────────────────────────
+    function downloadData() {
+      if (!myDiagram) { showToast('族谱尚未加载'); return; }
+      const clean = myDiagram.model.nodeDataArray
+        .filter(nd => nd.category !== 'LinkLabel')
+        .map(nd => Object.fromEntries(
+          Object.entries(nd).filter(([k, v]) => !k.startsWith('_') && v !== undefined)
+        ));
+      const json = JSON.stringify(clean, null, 2);
+      const blob = new Blob([json], { type: 'application/json' });
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement('a');
+      a.href     = url;
+      a.download = 'gongs-data.json';
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('数据已导出 ✓');
+    }
+
+    // ───────────────────────────────────────────────────────────────────────
+    // Edit form
+    // ───────────────────────────────────────────────────────────────────────
+    function openEditForm() {
+      hideContextMenu();
+      if (!_ctxNode || !_ctxNode.data) return;
+      const d = _ctxNode.data;
+      document.getElementById('edit-node-key').value   = d.key;
+      document.getElementById('edit-name').value        = d.name       ?? '';
+      document.getElementById('edit-gender').value      = d.gender     ?? 'M';
+      document.getElementById('edit-birthtime').value   = d.birthtime  ?? '';
+      document.getElementById('edit-alias').value       = d.alias      ?? '';
+      document.getElementById('edit-order').value       = d.order      ?? '';
+      document.getElementById('edit-birthplace').value  = d.birthplace ?? '';
+      document.getElementById('edit-deathtime').value   = d.deathtime  ?? '';
+      document.getElementById('edit-buryplace').value   = d.buryplace  ?? '';
+      document.getElementById('edit-comment').value     = d.comment    ?? '';
+      document.getElementById('edit-modal').style.display = 'flex';
+    }
+
+    function closeEditForm() {
+      document.getElementById('edit-modal').style.display = 'none';
+    }
+
+    function saveEditForm() {
+      const rawKey = document.getElementById('edit-node-key').value;
+      const key    = isNaN(rawKey) ? rawKey : Number(rawKey);
+      const node   = myDiagram.findNodeForKey(key);
+      if (!node) { closeEditForm(); return; }
+
+      const get = id => document.getElementById(id).value.trim();
+      // Returns the trimmed string, or undefined when empty (so getNodeInfo skips it).
+      const opt = id => get(id) || undefined;
+
+      const model = myDiagram.model;
+      const d     = node.data;
+
+      model.startTransaction('editNode');
+      const newName = get('edit-name');
+      if (newName) model.setDataProperty(d, 'name', newName);
+      model.setDataProperty(d, 'gender',     get('edit-gender'));
+      model.setDataProperty(d, 'birthtime',  opt('edit-birthtime'));
+      model.setDataProperty(d, 'alias',      opt('edit-alias'));
+      model.setDataProperty(d, 'order',      opt('edit-order'));
+      model.setDataProperty(d, 'birthplace', opt('edit-birthplace'));
+      model.setDataProperty(d, 'deathtime',  opt('edit-deathtime'));
+      model.setDataProperty(d, 'buryplace',  opt('edit-buryplace'));
+      model.setDataProperty(d, 'comment',    opt('edit-comment'));
+      model.commitTransaction('editNode');
+      // Force-refresh all bindings on the node (covers the getNodeInfo converter).
+      node.updateTargetBindings();
+
+      // Persist the updated model to localStorage, stripping LinkLabel helper nodes
+      // and any GoJS-internal properties.
+      const clean = myDiagram.model.nodeDataArray
+        .filter(nd => nd.category !== 'LinkLabel')
+        .map(nd => Object.fromEntries(
+          Object.entries(nd).filter(([k, v]) => !k.startsWith('_') && v !== undefined)
+        ));
+      localStorage.setItem(LS_DATA, JSON.stringify(clean));
+
+      closeEditForm();
+      showToast('保存成功 ✓');
+    }
+
     function centerOnNode(key) {
       const node = myDiagram.findNodeForKey(key);
       if (node && node.actualBounds.width > 0 && node.actualBounds.height > 0) {
@@ -841,11 +1185,38 @@
       autoLoadData();
 
       document.getElementById('choose-file').addEventListener('change', function () { readFile(this); });
+      document.getElementById('export-btn').addEventListener('click', downloadData);
       document.getElementById('searchBtn').addEventListener('click', searchDiagram);
       document.getElementById('nextBtn').addEventListener('click', findNext);
       document.getElementById('mySearch').addEventListener('keypress', e => {
         if (e.key === 'Enter') searchDiagram();
       });
+
+      // Context menu actions
+      document.getElementById('ctx-edit').addEventListener('click', openEditForm);
+
+      // Edit modal actions
+      document.getElementById('edit-close-btn').addEventListener('click',  closeEditForm);
+      document.getElementById('edit-cancel-btn').addEventListener('click', closeEditForm);
+      document.getElementById('edit-save-btn').addEventListener('click',   saveEditForm);
+
+      // Escape key closes the modal
+      document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') {
+          closeEditForm();
+          hideContextMenu();
+        }
+      });
+
+      // Clicking outside the context menu dismisses it
+      document.addEventListener('pointerdown', e => {
+        if (!document.getElementById('node-context-menu').contains(e.target)) {
+          hideContextMenu();
+        }
+      });
+
+      // Prevent the browser's native context menu over the diagram canvas
+      document.getElementById('myDiagramDiv').addEventListener('contextmenu', e => e.preventDefault());
     });
   </script>
 </body>

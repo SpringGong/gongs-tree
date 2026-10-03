@@ -3,6 +3,22 @@ In the current open project folder, there is one tree-template.html file, which 
 Please use them as the basis to convert it into a mobile app which can do the following:
 a. when the app start, it automatically read the data from the json file, and display it.
 
+=========
+please add one export function to download the data from json file
+
+===========
+
+
+
+
+
+
+
+
+
+
+
+========
 APK location:
 C:\Springgh-20260921\Work\Spring-AI\gongs-tree\android\app\build\outputs\apk\debug\app-debug.apk
 (3.58 MB — ready to install on any Android 5.1+ device)
@@ -11,16 +27,15 @@ To install on a phone, either:
 a. Copy the APK to the device and open it (enable "Install from unknown sources" in Settings → Security first), or
 b. Connect via USB and run: C:\Android\Sdk\platform-tools\adb.exe install app-debug.apk
 
+===========
 For future builds, just open a new terminal and run:
 cd C:\Springgh-20260921\Work\Spring-AI\gongs-tree\android
 gradlew.bat assembleDebug
 
-
+==========
 The IPA has been downloaded directly to your computer. No need to navigate GitHub at all.
 
 IPA location:
-
-
 C:\Springgh-20260921\Work\Spring-AI\gongs-tree\ios-output\App.ipa
 To install it on your iPhone, use one of these tools on your PC:
 
@@ -37,3 +52,10 @@ in the current openned project, the index.html makes the title and toolbar at th
 When import data via the File Import button, please add new logic to do the following:
 1. create a backup of the data-template.json as data-template-backup.json.
 2. use the new imported data to overwrite the data inside data-template.json
+
+
+===========
+for the index.html in the currently open project, please add Edit function to each node.
+
+On computer, when user right-click the mouse; or in mobile phone, when user long time press the node, then popup one menu named as "编辑"，when user choose it, then popup a form to edit each node
+
