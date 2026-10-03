@@ -799,6 +799,11 @@
       // Clicking the diagram background dismisses the menu.
       myDiagram.addDiagramListener('BackgroundSingleClicked', hideContextMenu);
       myDiagram.addDiagramListener('ObjectSingleClicked',     hideContextMenu);
+
+      // Suppress GoJS's built-in context menu (Copy / Cut / Delete / Zoom To Fit …).
+      // ObjectContextClicked still fires normally so our custom HTML menu works.
+      myDiagram.toolManager.contextMenuTool.showContextMenu = function(_cm, _obj) {};
+      myDiagram.toolManager.contextMenuTool.hideContextMenu = function() {};
     }
 
     // ───────────────────────────────────────────────────────────────────────
