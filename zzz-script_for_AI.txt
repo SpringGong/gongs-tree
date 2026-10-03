@@ -7,15 +7,31 @@ a. when the app start, it automatically read the data from the json file, and di
 please add one export function to download the data from json file
 
 ===========
+the edit fundtion and export function did not synchronized to the iOS ipa, please check it
 
+==========
+in iPhone, when press the node, the context menu shows up, but the default context menu of GoJs also shows up, they are:
+a. Copy
+b. Cut
+c. Delete
+e. Select All
+f. Scroll to part
+g. Zoom to Fit
+h. Reset Zoom
+please enhance the index.html file to disable the default context menus from GoJs when the node is long time pressed
 
+===========
+please disable the zoom in, zoom out function for the GoJs
 
+=========
+in iPhone, after editing one Node and save it, it shows "data saved", but the screen will freeze for a long time (maybe because large number of data in the json file), can you change the "data saved" to "数据保存成功", and also give a hint on the screen like data loading to inform the end user that he need to wait for a while then the screen can back to active
 
+===========
+in iPhone, when I export the data, it shows "数据已导出"，请问它把数据放到哪个目录下面去了
 
+On iOS (Capacitor WKWebView), the HTML <a download> method is silently ignored — the file doesn't actually go anywhere. The correct approach for iOS is to use the Web Share API, which triggers the native iOS share sheet and lets the user save to Files, AirDrop, iMessage, etc.
 
-
-
-
+Let me fix the export function to use the share sheet on iOS and keep the <a download> fallback for desktop.
 
 
 ========
