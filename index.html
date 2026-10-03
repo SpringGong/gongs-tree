@@ -1025,7 +1025,7 @@
     // ───────────────────────────────────────────────────────────────────────
     // Export
     // ───────────────────────────────────────────────────────────────────────
-    function downloadData() {
+    async function downloadData() {
       if (!myDiagram) { showToast('族谱尚未加载'); return; }
       const clean = myDiagram.model.nodeDataArray
         .filter(nd => nd.category !== 'LinkLabel')
@@ -1033,9 +1033,23 @@
           Object.entries(nd).filter(([k, v]) => !k.startsWith('_') && v !== undefined)
         ));
       const json = JSON.stringify(clean, null, 2);
-      const blob = new Blob([json], { type: 'application/json' });
-      const url  = URL.createObjectURL(blob);
-      const a    = document.createElement('a');
+      const file = new File([json], 'gongs-data.json', { type: 'application/json' });
+
+      // On iOS (WKWebView), <a download> is silently ignored.
+      // Use the native share sheet (Web Share API) instead so the user can
+      // save to the Files app, AirDrop, send via iMessage, etc.
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({ files: [file], title: '族谱数据导出' });
+        } catch (e) {
+          if (e.name !== 'AbortError') showToast('导出失败，请重试');
+        }
+        return;
+      }
+
+      // Desktop fallback: trigger a normal browser file download.
+      const url = URL.createObjectURL(file);
+      const a   = document.createElement('a');
       a.href     = url;
       a.download = 'gongs-data.json';
       a.click();
